@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="نظام إدارة مركز صيانة متكامل - نسخة نظيفة بدون بيانات إضافية">
+<title>نظام إدارة الصيانة</title>
+<style>
+:root{
+  --bg:#06100c;--panel:#0b1712;--panel2:#0e1d16;--line:#1d3027;--line2:#274238;
+  --text:#f4f7f5;--muted:#93a59c;--green:#1fd18b;--green2:#0da968;
+  --blue:#5ea8ff;--yellow:#f4c84d;--red:#ff6b6b;--purple:#b98cff;
+  --shadow:0 14px 40px rgba(0,0,0,.28);--r:16px;
+  --font: "Cairo", "Segoe UI", Tahoma, Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:var(--font);background:
+ radial-gradient(circle at 8% 0%,rgba(31,209,139,.07),transparent 28%),
+ radial-gradient(circle at 92% 0%,rgba(94,168,255,.05),transparent 24%),var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+.app{display:grid;grid-template-columns:280px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;padding:18px;border-left:1px solid var(--line);background:rgba(6,16,12,.96);backdrop-filter:blur(18px);display:flex;flex-direction:column;gap:14px}
+.brand{display:flex;align-items:center;gap:12px;padding:8px 4px 14px;border-bottom:1px solid var(--line)}
+.brand img{width:48px;height:48px;border-radius:14px;object-fit:contain;background:#fff0;padding:3px}
+.brand-mark{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#19d98d,#08784c);font-weight:900;color:#03110a}
+.brand-title{font-weight:900;font-size:15px}.brand-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.nav{display:flex;flex-direction:column;gap:5px}
+.nav button{border:1px solid transparent;background:transparent;color:#cbd5d0;text-align:right;padding:11px 12px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:.18s}
+.nav button:hover{background:#ffffff06;border-color:#ffffff08}
+.nav button.active{background:#0c2a1d;border-color:#1e5f43;color:#fff}
+.nav .nav-left{display:flex;align-items:center;gap:10px}
+.nav .key{font-size:10px;color:#6f8278;border:1px solid #294238;border-radius:6px;padding:2px 5px}
+.sidebar-footer{margin-top:auto;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:10px;line-height:1.7}
+.sidebar-footer strong{color:#dce6e0}
+.main{min-width:0}
+.topbar{height:72px;position:sticky;top:0;z-index:20;background:rgba(6,16,12,.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:12px 18px}
+.searchbox{flex:1;max-width:760px;display:flex;align-items:center;gap:8px;background:#09150f;border:1px solid var(--line2);padding:0 12px;border-radius:13px}
+.searchbox input{width:100%;height:44px;border:0;outline:0;background:transparent;color:var(--text)}
+.top-actions{margin-inline-start:auto;display:flex;gap:8px}
+.icon-btn,.ghost,.primary,.danger,.warn{border:1px solid var(--line2);background:#0b1712;color:#dbe6e0;min-height:42px;padding:0 13px;border-radius:11px}
+.icon-btn{width:42px;padding:0;display:grid;place-items:center}
+.primary{background:linear-gradient(135deg,#10b979,#0b915f);border-color:#1fd18b;color:#03110a;font-weight:900}
+.danger{background:#2a1010;border-color:#5f2323;color:#ffb1b1}
+.warn{background:#2a210b;border-color:#634d16;color:#ffe18b}
+.ghost:hover,.icon-btn:hover{background:#11231a}
+.content{padding:20px}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
+.page-title{font-size:22px;font-weight:900;margin:0}
+.page-sub{margin:4px 0 0;color:var(--muted);font-size:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(5,minmax(0,1fr))}
+.card{background:linear-gradient(180deg,#0c1913,#09140f);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.kpi{padding:16px;min-height:122px;display:flex;flex-direction:column;justify-content:space-between}
+.kpi .label{font-size:11px;color:var(--muted)}
+.kpi .value{font-size:25px;font-weight:900;letter-spacing:.2px}
+.kpi .meta{font-size:10px;color:#789088}
+.accent-green{border-color:#1b4f39}.accent-blue{border-color:#21486d}.accent-yellow{border-color:#5d4b1b}.accent-red{border-color:#5d2525}.accent-purple{border-color:#473269}
+.two-col{grid-template-columns:1.35fr .95fr}
+.three-col{grid-template-columns:repeat(3,minmax(0,1fr))}
+.panel{padding:16px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.panel-title{font-size:14px;font-weight:900;margin:0}.panel-sub{font-size:10px;color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:8px}
+.list-row{border:1px solid #183027;background:#09140f;border-radius:12px;padding:11px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.list-row .main-t{font-size:12px;font-weight:800}.list-row .sub{font-size:10px;color:var(--muted);margin-top:2px}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:10px;border:1px solid}
+.b-green{background:#0b2a1d;border-color:#1c6143;color:#7df3bb}
+.b-blue{background:#0b1f33;border-color:#214e7a;color:#a8d2ff}
+.b-yellow{background:#2b220c;border-color:#614d17;color:#ffe58e}
+.b-red{background:#2b1111;border-color:#642525;color:#ffadad}
+.b-gray{background:#171d1a;border-color:#33443d;color:#bcc7c2}.b-purple{background:#241634;border-color:#51347b;color:#d1b7ff}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:10px;color:#8ea097}
+.field input,.field select,.field textarea,.inline-input{background:#07110d;border:1px solid var(--line2);border-radius:10px;outline:none;color:var(--text);padding:10px 11px}
+.field input:focus,.field select:focus,.field textarea:focus,.inline-input:focus{border-color:#2aa875;box-shadow:0 0 0 3px #2aa87515}
+.field textarea{min-height:90px;resize:vertical}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.form-grid .full{grid-column:1/-1}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th,td{padding:10px 11px;border-bottom:1px solid #173027;text-align:right;font-size:11px;vertical-align:middle}
+th{background:#0b1812;color:#94a79d;font-weight:800;position:sticky;top:0;z-index:1}
+tbody tr{transition:.15s}
+tbody tr:hover{background:#0d2118}
+tbody tr.selected{background:#0c2b1d;outline:1px solid #23684a;outline-offset:-1px}
+.actions-cell{display:flex;gap:5px;justify-content:flex-start;flex-wrap:wrap}
+.small-btn{height:32px;padding:0 8px;border-radius:8px;border:1px solid var(--line2);background:#0e1c15;color:#d7e2dd;font-size:10px}
+.empty{padding:34px 18px;text-align:center;border:1px dashed #284038;border-radius:14px;color:#72847b}
+.empty strong{display:block;color:#bbc9c2;margin-bottom:5px}
+.stat-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stat{padding:12px;border:1px solid var(--line);border-radius:12px;background:#09140f}.stat b{display:block;font-size:17px}.stat span{font-size:9px;color:var(--muted)}
+.progress{height:7px;border-radius:999px;background:#13231c;overflow:hidden}.progress i{display:block;height:100%;background:linear-gradient(90deg,#0ea969,#28dc95)}
+.modal-backdrop{position:fixed;inset:0;z-index:100;background:#000b;display:none;align-items:center;justify-content:center;padding:18px}
+.modal-backdrop.show{display:flex}
+.modal{width:min(840px,100%);max-height:92vh;overflow:auto;background:#0b1712;border:1px solid #29493b;border-radius:18px;box-shadow:0 30px 90px #000c}
+.modal-head{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center;position:sticky;top:0;background:#0b1712;z-index:2}
+.modal-body{padding:17px}
+.modal-foot{padding:13px 17px;border-top:1px solid var(--line);display:flex;justify-content:flex-start;gap:8px;position:sticky;bottom:0;background:#0b1712}
+.notice{padding:11px 12px;border:1px solid #31533f;background:#0b2118;border-radius:11px;font-size:10px;color:#a9c8ba}
+.command-list{display:flex;flex-direction:column;gap:5px}.command{width:100%;border:1px solid transparent;background:#09140f;border-radius:10px;color:#dfe8e3;padding:10px;text-align:right;display:flex;justify-content:space-between;gap:12px}.command:hover,.command.focused{background:#0c2a1d;border-color:#245a42}
+.kbd{font-size:9px;color:#8ea399;border:1px solid #31463d;background:#0b1712;padding:3px 6px;border-radius:6px;white-space:nowrap}
+.toast-wrap{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:8px;align-items:center;width:min(420px,calc(100% - 30px))}
+.toast{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #285a42;background:#0b2118;box-shadow:var(--shadow);font-size:11px;animation:toastIn .2s ease}
+.toast.err{border-color:#6a2d2d;background:#291111}.toast.warn{border-color:#69531d;background:#2a210b}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.shortcut{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#09140f}
+.shortcut span{font-size:11px}.shortcut kbd{font-size:10px;color:#9fb2a8;border:1px solid #30463b;padding:3px 7px;border-radius:6px;background:#0c1711}
+.footer{padding:18px 20px;border-top:1px solid var(--line);margin-top:20px;color:#6e8178;font-size:10px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.mobile-nav{display:none}
+.print-only{display:none}
+@media(max-width:1150px){
+  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .two-col{grid-template-columns:1fr}
+}
+@media(max-width:850px){
+  .app{grid-template-columns:1fr}.sidebar{display:none}.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:50;background:#08120d;border-top:1px solid var(--line);padding:8px;gap:6px;overflow:auto}.mobile-nav button{min-width:75px;background:#0c1a13;border:1px solid var(--line);color:#b8c6bf;border-radius:10px;padding:8px;font-size:9px}.mobile-nav button.active{color:#fff;background:#0c2a1d;border-color:#236548}.content{padding-bottom:88px}.topbar{padding-inline:10px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.three-col{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.shortcuts{grid-template-columns:1fr}
+}
+@media(max-width:520px){.kpis{grid-template-columns:1fr}.page-head{flex-direction:column}.actions{width:100%}.actions button{flex:1}.top-actions .ghost{display:none}.content{padding:12px}.panel{padding:12px}}
+@media print{
+  body{background:#fff;color:#000}.sidebar,.topbar,.mobile-nav,.page-head,.footer,.no-print{display:none!important}.app{display:block}.content{padding:0}.card{box-shadow:none;border:0;background:#fff}.print-only{display:block}
+  table{min-width:0}th,td{color:#000;background:#fff;border-color:#ccc;font-size:9px}.panel{border:1px solid #ddd}.badge{color:#000!important;background:#eee!important;border-color:#999!important}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modal"></div>
+</div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+(() => {
+"use strict";
+
+const STORAGE_KEY = "infinity_mina_maintenance_v7";
+const DEV = {
+  nameEn: "ENG. Mark Eshak",
+  nameAr: "المهندس مارك اسحق",
+  brand: "Infinity MEN2",
+  role: "Software Engineer",
+  description: "تطوير هندسة البرمجيات وأنظمة سطح المكتب المتكاملة لإدارة الأعمال.",
+  label: "Mark Eshak | Infinity MEN2- برمجة وتصميم",
+  linktree: "https://linktr.ee/markeshak",
+  portfolio: "https://markeshak00000.github.io/portfolio/"
+};
+
+const defaultState = {
+  settings: {
+    businessName: "",
+    businessAddress: "",
+    businessPhone: "",
+    businessWhatsApp: "",
+    currency: "جنيه",
+    printerWidth: "80mm",
+    warrantyDefault: 30,
+    invoiceFooter: ""
+  },
+  customers: [],
+  devices: [],
+  parts: [],
+  suppliers: [],
+  transactions: [],
+  documents: [],
+  activity: []
+};
+
+let state = loadState();
+let currentPage = "dashboard";
+let selected = {
+  customers: -1, devices: -1, parts: -1, suppliers: -1, transactions: -1
+};
+let filters = {
+  global: "",
+  devices: {search:"",status:"all",type:"all",from:"",to:""},
+  customers: {search:"",level:"all"},
+  parts: {search:"",stock:"all"},
+  suppliers: {search:""},
+  finance: {from:"",to:"",type:"all"},
+  reports: {from:"",to:""}
+};
+let commandIndex = 0;
+let commandItems = [];
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return structuredClone(defaultState);
+    const parsed = JSON.parse(raw);
+    return {
+      ...structuredClone(defaultState),
+      ...parsed,
+      settings:{...defaultState.settings,...(parsed.settings||{})},
+      customers:Array.isArray(parsed.customers)?parsed.customers:[],
+      devices:Array.isArray(parsed.devices)?parsed.devices:[],
+      parts:Array.isArray(parsed.parts)?parsed.parts:[],
+      suppliers:Array.isArray(parsed.suppliers)?parsed.suppliers:[],
+      transactions:Array.isArray(parsed.transactions)?parsed.transactions:[],
+      documents:Array.isArray(parsed.documents)?parsed.documents:[],
+      activity:Array.isArray(parsed.activity)?parsed.activity:[]
+    };
+  }catch(e){ return structuredClone(defaultState); }
+}
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+function uid(prefix){
+  return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+}
+function today(){
+  const d=new Date();
+  const m=String(d.getMonth()+1).padStart(2,"0");
+  const day=String(d.getDate()).padStart(2,"0");
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+function nowISO(){ return new Date().toISOString(); }
+function fmtMoney(v){
+  const n=Number(v||0);
+  return new Intl.NumberFormat("ar-EG",{maximumFractionDigits:2,minimumFractionDigits:0}).format(n) + " " + (state.settings.currency||"جنيه");
+}
+function escapeHtml(s){
+  return String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+}
+function safeNum(v){ const n=Number(v); return Number.isFinite(n)?n:0; }
+function textSearch(obj,q){
+  if(!q) return true;
+  const s=q.toLowerCase();
+  return JSON.stringify(obj).toLowerCase().includes(s);
+}
+function getCustomer(id){ return state.customers.find(x=>x.id===id); }
+function getSupplier(id){ return state.suppliers.find(x=>x.id===id); }
+function deviceBalance(d){ return Math.max(0,safeNum(d.cost)-safeNum(d.paid)); }
+function warrantyExpiry(d){
+  if(!d.receivedDate || !safeNum(d.warrantyDays)) return "";
+  const x=new Date(d.receivedDate+"T12:00:00");
+  x.setDate(x.getDate()+safeNum(d.warrantyDays));
+  return x.toISOString().slice(0,10);
+}
+function statusClass(s){
+  return s==="تم التسليم"?"b-green":s==="جاهز"?"b-blue":s==="متأخر"?"b-red":s==="في الانتظار"?"b-yellow":"b-gray";
+}
+function stockClass(p){
+  const stock=safeNum(p.stock), min=safeNum(p.minStock);
+  return stock<=0?"b-red":stock<=min?"b-yellow":"b-green";
+}
+function recordActivity(text){
+  state.activity.unshift({id:uid("A"),text,time:nowISO()});
+  state.activity=state.activity.slice(0,60);
+  saveState();
+}
+function toast(msg,type=""){
+  const el=document.createElement("div");
+  el.className="toast "+type;
+  el.textContent=msg;
+  document.getElementById("toastWrap").appendChild(el);
+  setTimeout(()=>el.remove(),2800);
+}
+function confirmAction(message){
+  return window.confirm(message);
+}
+function openModal(title,body,footer=""){
+  const m=document.getElementById("modal");
+  m.innerHTML=`<div class="modal-head"><div><div class="panel-title">${escapeHtml(title)}</div></div><button class="icon-btn" data-close-modal>✕</button></div><div class="modal-body">${body}</div>${footer?`<div class="modal-foot">${footer}</div>`:""}`;
+  document.getElementById("modalBackdrop").classList.add("show");
+}
+function closeModal(){
+  document.getElementById("modalBackdrop").classList.remove("show");
+  document.getElementById("modal").innerHTML="";
+}
+document.getElementById("modalBackdrop").addEventListener("click",e=>{ if(e.target.id==="modalBackdrop") closeModal(); });
+document.addEventListener("click",e=>{ if(e.target.closest("[data-close-modal]")) closeModal(); });
+
+function navItems(){
+  return [
+    ["dashboard","لوحة التحكم","Ctrl+1"],
+    ["devices","الأجهزة","Ctrl+2"],
+    ["customers","العملاء","Ctrl+3"],
+    ["parts","قطع الغيار","Ctrl+4"],
+    ["suppliers","الموردون","Ctrl+5"],
+    ["finance","المالية","Ctrl+6"],
+    ["documents","المستندات","Ctrl+7"],
+    ["reports","التقارير","Ctrl+8"],
+    ["settings","الإعدادات",""]
+  ];
+}
+function navHtml(){
+  return navItems().map(([id,label,key])=>`
+    <button class="${currentPage===id?"active":""}" data-page="${id}">
+      <span class="nav-left"><span>${iconFor(id)}</span><span>${label}</span></span>
+      ${key?`<span class="key">${key}</span>`:""}
+    </button>`).join("");
+}
+function iconFor(id){
+  const icons={
+    dashboard:"◈",devices:"▦",customers:"◎",parts:"◫",suppliers:"♧",
+    finance:"▤",documents:"▤",reports:"◭",settings:"⚙"
+  };
+  return icons[id]||"•";
+}
+function mobileNavHtml(){
+  return navItems().map(([id,label])=>`<button class="${currentPage===id?"active":""}" data-page="${id}">${iconFor(id)}<br>${label}</button>`).join("");
+}
+
+function layout(content){
+  const s=state.settings;
+  document.getElementById("app").innerHTML=`
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="assets/images/logo.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+        <div class="brand-mark" style="display:none">IM</div>
+        <div><div class="brand-title">${escapeHtml(s.businessName||"نظام إدارة الصيانة")}</div><div class="brand-sub">نسخة تشغيل فعلية • بياناتك فقط</div></div>
+      </div>
+      <nav class="nav">${navHtml()}</nav>
+      <button class="ghost" id="openShortcuts">⌨ الاختصارات</button>
+      <div class="sidebar-footer">
+        <strong>${escapeHtml(DEV.nameEn)}</strong><br>
+        ${escapeHtml(DEV.role)} • ${escapeHtml(DEV.brand)}<br>
+        <a href="${DEV.linktree}" target="_blank" rel="noopener">Linktree</a> •
+        <a href="${DEV.portfolio}" target="_blank" rel="noopener">Portfolio</a>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div class="searchbox">⌕ <input id="globalSearch" value="${escapeHtml(filters.global)}" placeholder="بحث شامل: عميل، جهاز، سيريال، باركود، مستند..." autocomplete="off"></div>
+        <div class="top-actions">
+          <button class="ghost" id="commandBtn">Ctrl+K</button>
+          <button class="icon-btn" id="refreshBtn" title="تحديث">↻</button>
+        </div>
+      </header>
+      <section class="content">${content}</section>
+      <footer class="footer"><span>${escapeHtml(DEV.label)}</span><span>${escapeHtml(DEV.description)}</span></footer>
+    </main>
+  </div>
+  <nav class="mobile-nav">${mobileNavHtml()}<button id="openShortcutsMobile">⌨<br>اختصارات</button></nav>`;
+  bindCommon();
+}
+
+function bindCommon(){
+  document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.page)));
+  document.getElementById("commandBtn")?.addEventListener("click",openCommandPalette);
+  document.getElementById("openShortcuts")?.addEventListener("click",showShortcuts);
+  document.getElementById("openShortcutsMobile")?.addEventListener("click",showShortcuts);
+  document.getElementById("refreshBtn")?.addEventListener("click",()=>{saveState(); render(); toast("تم تحديث البيانات");});
+  const g=document.getElementById("globalSearch");
+  g?.addEventListener("input",e=>{filters.global=e.target.value;});
+  g?.addEventListener("keydown",e=>{ if(e.key==="Enter" && filters.global.trim()){navigate("devices");filters.devices.search=filters.global.trim();render();}});
+}
+
+function navigate(page){
+  currentPage=page;
+  render();
+}
+
+function render(){
+  let content="";
+  if(currentPage==="dashboard") content=renderDashboard();
+  if(currentPage==="devices") content=renderDevices();
+  if(currentPage==="customers") content=renderCustomers();
+  if(currentPage==="parts") content=renderParts();
+  if(currentPage==="suppliers") content=renderSuppliers();
+  if(currentPage==="finance") content=renderFinance();
+  if(currentPage==="documents") content=renderDocuments();
+  if(currentPage==="reports") content=renderReports();
+  if(currentPage==="settings") content=renderSettings();
+  layout(content);
+  bindPage();
+}
+
+function bindPage(){
+  document.querySelectorAll("[data-action]").forEach(el=>el.addEventListener("click",handleAction));
+  // Escape barcode input into parts search quickly
+  const barcode=document.getElementById("barcodeQuick");
+  if(barcode) barcode.focus();
+}
+
+function handleAction(e){
+  const a=e.currentTarget.dataset.action;
+  const id=e.currentTarget.dataset.id;
+  if(a==="new-device") openDeviceForm();
+  if(a==="edit-device") openDeviceForm(id);
+  if(a==="delete-device") deleteDevice(id);
+  if(a==="new-customer") openCustomerForm();
+  if(a==="edit-customer") openCustomerForm(id);
+  if(a==="delete-customer") deleteCustomer(id);
+  if(a==="new-part") openPartForm();
+  if(a==="edit-part") openPartForm(id);
+  if(a==="delete-part") deletePart(id);
+  if(a==="new-supplier") openSupplierForm();
+  if(a==="edit-supplier") openSupplierForm(id);
+  if(a==="delete-supplier") deleteSupplier(id);
+  if(a==="new-transaction") openTransactionForm();
+  if(a==="delete-transaction") deleteTransaction(id);
+  if(a==="print-device") printDevice(id);
+  if(a==="whatsapp-device") whatsappDevice(id);
+  if(a==="doc-device") createDeviceDocument(id);
+  if(a==="part-stock-in") stockMovement(id,"in");
+  if(a==="part-stock-out") stockMovement(id,"out");
+  if(a==="close-day") dailyClose();
+  if(a==="backup") backupJson();
+  if(a==="restore") document.getElementById("restoreFile")?.click();
+  if(a==="export-customers") exportCSV(state.customers,"customers.csv",["id","name","phone","level","points","notes"]);
+  if(a==="export-devices") exportCSV(state.devices,"devices.csv",["id","customerName","type","brand","model","serial","status","cost","paid","receivedDate","estimatedDate"]);
+  if(a==="export-parts") exportCSV(state.parts,"parts.csv",["id","name","barcode","stock","minStock","buyPrice","sellPrice","location","supplierId"]);
+  if(a==="export-transactions") exportCSV(state.transactions,"transactions.csv",["id","date","type","category","amount","method","note"]);
+}
+
+function renderDashboard(){
+  const todayStr=today();
+  const todayTx=state.transactions.filter(x=>x.date===todayStr);
+  const incomeToday=todayTx.filter(x=>x.type==="income").reduce((a,b)=>a+safeNum(b.amount),0);
+  const expenseToday=todayTx.filter(x=>x.type==="expense").reduce((a,b)=>a+safeNum(b.amount),0);
+  const due=state.devices.reduce((a,d)=>a+deviceBalance(d),0);
+  const lowParts=state.parts.filter(p=>safeNum(p.stock)<=safeNum(p.minStock));
+  const openDevices=state.devices.filter(d=>d.status!=="تم التسليم");
+  const overdue=state.devices.filter(d=>d.status==="متأخر");
+  const recent=state.activity.slice(0,8);
+  return `
+    <div class="page-head">
+      <div><h1 class="page-title">لوحة التحكم</h1><p class="page-sub">ملخص فعلي من البيانات المسجلة على هذا الجهاز.</p></div>
+      <div class="actions"><button class="primary" data-action="new-device">+ تسجيل جهاز</button><button class="ghost" data-action="new-customer">+ عميل</button><button class="ghost" data-action="new-part">+ قطعة</button></div>
+    </div>
+    <div class="grid kpis">
+      <div class="card kpi accent-green"><span class="label">إيراد اليوم</span><span class="value">${fmtMoney(incomeToday)}</span><span class="meta">${todayTx.filter(x=>x.type==="income").length} عملية دخل</span></div>
+      <div class="card kpi accent-red"><span class="label">مصروفات اليوم</span><span class="value">${fmtMoney(expenseToday)}</span><span class="meta">${todayTx.filter(x=>x.type==="expense").length} عملية مصروف</span></div>
+      <div class="card kpi accent-blue"><span class="label">أجهزة مفتوحة</span><span class="value">${openDevices.length}</span><span class="meta">${overdue.length} متأخر</span></div>
+      <div class="card kpi accent-yellow"><span class="label">مبالغ متبقية على الأجهزة</span><span class="value">${fmtMoney(due)}</span><span class="meta">حسب تكلفة/مدفوع كل جهاز</span></div>
+      <div class="card kpi accent-purple"><span class="label">قطع منخفضة</span><span class="value">${lowParts.length}</span><span class="meta">تحت الحد الأدنى أو نافدة</span></div>
+    </div>
+    <div class="grid two-col" style="margin-top:14px">
+      <div class="card panel">
+        <div class="panel-head"><div><h3 class="panel-title">حالة الأجهزة</h3><div class="panel-sub">نظرة سريعة على الشغل الحالي</div></div><button class="ghost" data-page="devices">فتح الأجهزة</button></div>
+        ${statusSummary()}
+      </div>
+      <div class="card panel">
+        <div class="panel-head"><div><h3 class="panel-title">تنبيهات التشغيل</h3><div class="panel-sub">الأمور التي تحتاج متابعة</div></div></div>
+        ${alertsHtml()}
+      </div>
+    </div>
+    <div class="grid two-col" style="margin-top:14px">
+      <div class="card panel">
+        <div class="panel-head"><div><h3 class="panel-title">آخر النشاط</h3><div class="panel-sub">آخر التعديلات على النظام</div></div></div>
+        ${recent.length?`<div class="list">${recent.map(a=>`<div class="list-row"><div><div class="main-t">${escapeHtml(a.text)}</div><div class="sub">${new Date(a.time).toLocaleString("ar-EG")}</div></div></div>`).join("")}</div>`:`<div class="empty"><strong>لا يوجد نشاط بعد</strong>ابدأ بإضافة عميل أو جهاز أو قطعة.</div>`}
+      </div>
+      <div class="card panel">
+        <div class="panel-head"><div><h3 class="panel-title">مؤشرات البيانات</h3><div class="panel-sub">الأعداد الحالية بدون بيانات وهمية</div></div></div>
+        <div class="stat-strip">
+          <div class="stat"><b>${state.customers.length}</b><span>عملاء</span></div>
+          <div class="stat"><b>${state.devices.length}</b><span>أجهزة</span></div>
+          <div class="stat"><b>${state.parts.length}</b><span>قطع</span></div>
+          <div class="stat"><b>${state.suppliers.length}</b><span>موردون</span></div>
+        </div>
+        <div style="margin-top:12px" class="notice">المخزون والحركة المالية تحفظ محليًا على الجهاز. أنشئ نسخة JSON احتياطية بشكل دوري من الإعدادات.</div>
+      </div>
+    </div>`;
+}
+function statusSummary(){
+  const rows=["في الانتظار","قيد الصيانة","جاهز","متأخر","تم التسليم"];
+  const total=Math.max(state.devices.length,1);
+  return rows.map(s=>{
+    const n=state.devices.filter(d=>d.status===s).length;
+    return `<div class="list-row"><div><div class="main-t">${s}</div><div class="sub">${n} جهاز</div></div><span class="progress" style="width:150px"><i style="width:${Math.round(n/total*100)}%"></i></span></div>`;
+  }).join("");
+}
+function alertsHtml(){
+  const alerts=[];
+  const low=state.parts.filter(p=>safeNum(p.stock)<=safeNum(p.minStock));
+  const overdue=state.devices.filter(d=>d.status==="متأخر");
+  if(overdue.length) alerts.push(`<div class="list-row"><div><div class="main-t">أجهزة متأخرة</div><div class="sub">${overdue.length} جهاز يحتاج متابعة</div></div><span class="badge b-red">متابعة</span></div>`);
+  if(low.length) alerts.push(`<div class="list-row"><div><div class="main-t">مخزون منخفض</div><div class="sub">${low.length} قطعة عند/تحت الحد</div></div><span class="badge b-yellow">مخزون</span></div>`);
+  const unpaid=state.devices.filter(d=>deviceBalance(d)>0&&d.status==="جاهز").length;
+  if(unpaid) alerts.push(`<div class="list-row"><div><div class="main-t">أجهزة جاهزة وبها باقي</div><div class="sub">${unpaid} جهاز</div></div><span class="badge b-blue">تحصيل</span></div>`);
+  if(!alerts.length) return `<div class="empty"><strong>لا توجد تنبيهات</strong>النظام لا يحتوي حاليًا على حالات تستدعي إجراءً.</div>`;
+  return `<div class="list">${alerts.join("")}</div>`;
+}
+
+function renderDevices(){
+  const f=filters.devices;
+  let rows=state.devices.filter(d=>{
+    const q=f.search.trim();
+    const dt=(d.receivedDate||"");
+    return textSearch(d,q) &&
+      (f.status==="all"||d.status===f.status) &&
+      (f.type==="all"||d.type===f.type) &&
+      (!f.from||dt>=f.from)&&(!f.to||dt<=f.to);
+  });
+  if(selected.devices>=rows.length) selected.devices=rows.length-1;
+  return `
+  <div class="page-head">
+    <div><h1 class="page-title">الأجهزة</h1><p class="page-sub">تسجيل واستلام وتسليم الأجهزة مع التكلفة والمدفوع والمتبقي والضمان.</p></div>
+    <div class="actions"><button class="primary" data-action="new-device">+ جهاز جديد <span class="kbd">Ctrl+N</span></button><button class="ghost" data-action="export-devices">تصدير CSV</button></div>
+  </div>
+  <div class="card panel">
+    <div class="toolbar">
+      <input class="inline-input" id="deviceSearch" value="${escapeHtml(f.search)}" placeholder="بحث بالعميل أو السيريال أو الموديل..." style="min-width:240px;flex:1">
+      <select class="inline-input" id="deviceStatus"><option value="all">كل الحالات</option>${["في الانتظار","قيد الصيانة","جاهز","متأخر","تم التسليم"].map(x=>`<option ${f.status===x?"selected":""}>${x}</option>`).join("")}</select>
+      <select class="inline-input" id="deviceType"><option value="all">كل الأنواع</option>${["موبايل","لابتوب","تابلت","شاشة","طابعة","أخرى"].map(x=>`<option ${f.type===x?"selected":""}>${x}</option>`).join("")}</select>
+      <input class="inline-input" type="date" id="deviceFrom" value="${f.from}">
+      <input class="inline-input" type="date" id="deviceTo" value="${f.to}">
+    </div>
+    <div class="table-wrap">
+      ${rows.length?`
+      <table id="devicesTable"><thead><tr><th>#</th><th>العميل</th><th>الجهاز</th><th>السيريال</th><th>الحالة</th><th>التاريخ</th><th>التكلفة</th><th>المتبقي</th><th>الإجراء</th></tr></thead>
+      <tbody>${rows.map((d,i)=>{
+        const c=getCustomer(d.customerId);
+        return `<tr data-row-index="${i}" class="${i===selected.devices?"selected":""}">
+          <td>${i+1}</td><td><b>${escapeHtml(c?.name||d.customerName||"غير مرتبط")}</b><div class="sub">${escapeHtml(c?.phone||"")}</div></td>
+          <td><b>${escapeHtml([d.brand,d.model].filter(Boolean).join(" ")||d.type)}</b><div class="sub">${escapeHtml(d.type||"")}</div></td>
+          <td>${escapeHtml(d.serial||"—")}</td><td><span class="badge ${statusClass(d.status)}">${escapeHtml(d.status||"—")}</span></td>
+          <td>${escapeHtml(d.receivedDate||"—")}</td><td>${fmtMoney(d.cost)}</td><td>${fmtMoney(deviceBalance(d))}</td>
+          <td class="actions-cell">
+            <button class="small-btn" data-action="edit-device" data-id="${d.id}">تعديل</button>
+            <button class="small-btn" data-action="whatsapp-device" data-id="${d.id}">واتساب</button>
+            <button class="small-btn" data-action="print-device" data-id="${d.id}">طباعة</button>
+          </td>
+        </tr>`}).join("")}</tbody></table>`:
+        `<div class="empty"><strong>لا توجد أجهزة مطابقة</strong>${state.devices.length?"غيّر الفلاتر أو أضف جهازًا جديدًا.":"لا توجد بيانات مسجلة. أضف أول جهاز فعلي من زر «جهاز جديد»."}</div>`}
+    </div>
+    <div class="notice" style="margin-top:10px">التنقل السريع: ↑ ↓ لاختيار سجل • Enter للتعديل • Delete للحذف • Ctrl+N لإضافة جهاز.</div>
+  </div>`;
+}
+
+function renderCustomers(){
+  const f=filters.customers;
+  const rows=state.customers.filter(c=>textSearch(c,f.search)&&(f.level==="all"||c.level===f.level));
+  if(selected.customers>=rows.length) selected.customers=rows.length-1;
+  const table=rows.length?`<table id="customersTable"><thead><tr><th>#</th><th>الاسم</th><th>الموبايل</th><th>المستوى</th><th>الأجهزة</th><th>إجمالي المدفوع</th><th>آخر زيارة</th><th>الإجراء</th></tr></thead><tbody>
+  ${rows.map((c,i)=>{
+    const ds=state.devices.filter(d=>d.customerId===c.id);
+    const paid=ds.reduce((a,d)=>a+safeNum(d.paid),0);
+    return `<tr data-row-index="${i}" class="${i===selected.customers?"selected":""}">
+      <td>${i+1}</td><td><b>${escapeHtml(c.name)}</b><div class="sub">${escapeHtml(c.notes||"")}</div></td><td>${escapeHtml(c.phone||"—")}</td>
+      <td><span class="badge ${c.level==="VIP"?"b-purple":"b-gray"}">${escapeHtml(c.level||"عادي")}</span></td><td>${ds.length}</td><td>${fmtMoney(paid)}</td><td>${escapeHtml(c.lastVisit||"—")}</td>
+      <td class="actions-cell"><button class="small-btn" data-action="edit-customer" data-id="${c.id}">تعديل</button><button class="small-btn" data-action="delete-customer" data-id="${c.id}">حذف</button></td>
+    </tr>`;
+  }).join("")}</tbody></table>`:`<div class="empty"><strong>لا يوجد عملاء</strong>أضف أول عميل من زر «عميل جديد».</div>`;
+  return `
+  <div class="page-head"><div><h1 class="page-title">العملاء</h1><p class="page-sub">بيانات العملاء وسجل أجهزتهم ومدفوعاتهم.</p></div>
+  <div class="actions"><button class="primary" data-action="new-customer">+ عميل جديد <span class="kbd">Ctrl+Shift+C</span></button><button class="ghost" data-action="export-customers">تصدير CSV</button></div></div>
+  <div class="card panel"><div class="toolbar">
+    <input class="inline-input" id="customerSearch" value="${escapeHtml(f.search)}" placeholder="بحث بالاسم أو رقم الموبايل..." style="flex:1;min-width:220px">
+    <select class="inline-input" id="customerLevel"><option value="all">كل المستويات</option>${["عادي","مميز","VIP"].map(x=>`<option ${f.level===x?"selected":""}>${x}</option>`).join("")}</select>
+  </div><div class="table-wrap">${table}</div></div>`;
+}
+
+function renderParts(){
+  const f=filters.parts;
+  const rows=state.parts.filter(p=>{
+    const low=safeNum(p.stock)<=safeNum(p.minStock);
+    return textSearch(p,f.search)&&(f.stock==="all"||(f.stock==="low"&&low)||(f.stock==="out"&&safeNum(p.stock)<=0));
+  });
+  if(selected.parts>=rows.length) selected.parts=rows.length-1;
+  const table=rows.length?`<table id="partsTable"><thead><tr><th>#</th><th>القطعة</th><th>الباركود</th><th>المخزون</th><th>الحد الأدنى</th><th>شراء</th><th>بيع</th><th>الموقع</th><th>الإجراء</th></tr></thead><tbody>
+    ${rows.map((p,i)=>`<tr data-row-index="${i}" class="${i===selected.parts?"selected":""}">
+      <td>${i+1}</td><td><b>${escapeHtml(p.name)}</b></td><td class="font-mono">${escapeHtml(p.barcode||"—")}</td>
+      <td><span class="badge ${stockClass(p)}">${safeNum(p.stock)}</span></td><td>${safeNum(p.minStock)}</td><td>${fmtMoney(p.buyPrice)}</td><td>${fmtMoney(p.sellPrice)}</td><td>${escapeHtml(p.location||"—")}</td>
+      <td class="actions-cell"><button class="small-btn" data-action="part-stock-in" data-id="${p.id}">+ مخزون</button><button class="small-btn" data-action="part-stock-out" data-id="${p.id}">- مخزون</button><button class="small-btn" data-action="edit-part" data-id="${p.id}">تعديل</button></td>
+    </tr>`).join("")}</tbody></table>`:`<div class="empty"><strong>لا توجد قطع غيار</strong>أضف قطع الغيار الفعلية للمحل.</div>`;
+  return `
+  <div class="page-head"><div><h1 class="page-title">قطع الغيار والمخزون</h1><p class="page-sub">باركود، مخزون، حد أدنى، أسعار شراء وبيع وحركة دخول/خروج.</p></div>
+  <div class="actions"><button class="primary" data-action="new-part">+ قطعة جديدة <span class="kbd">Ctrl+Shift+P</span></button><button class="ghost" data-action="export-parts">تصدير CSV</button></div></div>
+  <div class="card panel">
+    <div class="toolbar">
+      <input class="inline-input" id="barcodeQuick" placeholder="ماسح الباركود: امسح ثم Enter" style="min-width:250px">
+      <input class="inline-input" id="partSearch" value="${escapeHtml(f.search)}" placeholder="بحث بالاسم أو الباركود..." style="flex:1;min-width:220px">
+      <select class="inline-input" id="partStock"><option value="all">كل المخزون</option><option value="low" ${f.stock==="low"?"selected":""}>منخفض</option><option value="out" ${f.stock==="out"?"selected":""}>نافد</option></select>
+    </div><div class="table-wrap">${table}</div>
+  </div>`;
+}
+
+function renderSuppliers(){
+  const rows=state.suppliers.filter(s=>textSearch(s,filters.suppliers.search));
+  if(selected.suppliers>=rows.length) selected.suppliers=rows.length-1;
+  const table=rows.length?`<table id="suppliersTable"><thead><tr><th>#</th><th>المورد</th><th>الموبايل</th><th>العنوان</th><th>ملاحظات</th><th>الإجراء</th></tr></thead><tbody>
+  ${rows.map((s,i)=>`<tr data-row-index="${i}" class="${i===selected.suppliers?"selected":""}"><td>${i+1}</td><td><b>${escapeHtml(s.name)}</b></td><td>${escapeHtml(s.phone||"—")}</td><td>${escapeHtml(s.address||"—")}</td><td>${escapeHtml(s.notes||"—")}</td><td class="actions-cell"><button class="small-btn" data-action="edit-supplier" data-id="${s.id}">تعديل</button><button class="small-btn" data-action="delete-supplier" data-id="${s.id}">حذف</button></td></tr>`).join("")}</tbody></table>`:`<div class="empty"><strong>لا يوجد موردون</strong>أضف بيانات الموردين الفعلية.</div>`;
+  return `
+  <div class="page-head"><div><h1 class="page-title">الموردون</h1><p class="page-sub">إدارة بيانات الموردين وحركة المشتريات.</p></div>
+  <div class="actions"><button class="primary" data-action="new-supplier">+ مورد جديد <span class="kbd">Ctrl+Shift+S</span></button></div></div>
+  <div class="card panel"><div class="toolbar"><input class="inline-input" id="supplierSearch" value="${escapeHtml(filters.suppliers.search)}" placeholder="بحث باسم المورد أو الهاتف..." style="flex:1"></div>
+  <div class="table-wrap">${table}</div></div>`;
+}
+
+function renderFinance(){
+  const f=filters.finance;
+  const rows=state.transactions.filter(t=>
+    (!f.from||t.date>=f.from)&&(!f.to||t.date<=f.to)&&(f.type==="all"||t.type===f.type)
+  ).sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  const income=rows.filter(x=>x.type==="income").reduce((a,b)=>a+safeNum(b.amount),0);
+  const expense=rows.filter(x=>x.type==="expense").reduce((a,b)=>a+safeNum(b.amount),0);
+  const net=income-expense;
+  if(selected.transactions>=rows.length) selected.transactions=rows.length-1;
+  const table=rows.length?`<table><thead><tr><th>#</th><th>التاريخ</th><th>النوع</th><th>التصنيف</th><th>المبلغ</th><th>طريقة الدفع</th><th>البيان</th><th></th></tr></thead><tbody>
+    ${rows.map((t,i)=>`<tr data-row-index="${i}" class="${i===selected.transactions?"selected":""}"><td>${i+1}</td><td>${escapeHtml(t.date)}</td><td><span class="badge ${t.type==="income"?"b-green":"b-red"}">${t.type==="income"?"دخل":"مصروف"}</span></td><td>${escapeHtml(t.category||"—")}</td><td>${fmtMoney(t.amount)}</td><td>${escapeHtml(t.method||"—")}</td><td>${escapeHtml(t.note||"—")}</td><td><button class="small-btn" data-action="delete-transaction" data-id="${t.id}">حذف</button></td></tr>`).join("")}</tbody></table>`:`<div class="empty"><strong>لا توجد عمليات مالية</strong>أدخل أول حركة مالية فعلية أو سجّل دفعة مرتبطة بجهاز.</div>`;
+  return `
+  <div class="page-head"><div><h1 class="page-title">المالية</h1><p class="page-sub">دخل ومصروفات وإغلاق يومي مع طرق دفع متعددة.</p></div>
+  <div class="actions"><button class="primary" data-action="new-transaction">+ عملية مالية</button><button class="ghost" data-action="close-day">إغلاق اليوم</button><button class="ghost" data-action="export-transactions">تصدير CSV</button></div></div>
+  <div class="grid three-col">
+    <div class="card panel"><div class="panel-sub">الدخل</div><div class="kpi value">${fmtMoney(income)}</div></div>
+    <div class="card panel"><div class="panel-sub">المصروف</div><div class="kpi value">${fmtMoney(expense)}</div></div>
+    <div class="card panel"><div class="panel-sub">الصافي</div><div class="kpi value">${fmtMoney(net)}</div></div>
+  </div>
+  <div class="card panel" style="margin-top:14px">
+    <div class="toolbar"><input class="inline-input" type="date" id="financeFrom" value="${f.from}"><input class="inline-input" type="date" id="financeTo" value="${f.to}">
+    <select class="inline-input" id="financeType"><option value="all">الكل</option><option value="income" ${f.type==="income"?"selected":""}>دخل</option><option value="expense" ${f.type==="expense"?"selected":""}>مصروف</option></select></div>
+    <div class="table-wrap">${table}</div>
+  </div>`;
+}
+
+function renderDocuments(){
+  const docs=state.documents.slice().sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
+  const list=docs.length?`<div class="list">${docs.map(d=>`<div class="list-row"><div><div class="main-t">${escapeHtml(d.title)}</div><div class="sub">${escapeHtml(d.number)} • ${new Date(d.createdAt).toLocaleString("ar-EG")}</div></div><button class="small-btn" onclick="printDocument('${d.id}')">طباعة</button></div>`).join("")}</div>`:`<div class="empty"><strong>لا توجد مستندات بعد</strong>المستندات تُنشأ من سجلات الأجهزة الفعلية.</div>`;
+  return `
+  <div class="page-head"><div><h1 class="page-title">المستندات</h1><p class="page-sub">إيصالات واستلام وتسليم وتقارير يمكن طباعتها أو حفظها PDF من نافذة الطباعة.</p></div></div>
+  <div class="card panel">
+    <div class="notice" style="margin-bottom:12px">لإنشاء مستند لجهاز: افتح صفحة الأجهزة ثم اضغط «طباعة». بعد فتح نافذة الطباعة يمكن اختيار «Save as PDF» أو الطابعة الحرارية 58/80mm حسب تعريف جهازك.</div>
+    ${list}
+  </div>`;
+}
+
+function renderReports(){
+  const f=filters.reports;
+  const from=f.from||"0000-00-00", to=f.to||"9999-99-99";
+  const dev=state.devices.filter(d=>(d.receivedDate||"")>=from&&(d.receivedDate||"")<=to);
+  const tx=state.transactions.filter(t=>(t.date||"")>=from&&(t.date||"")<=to);
+  const income=tx.filter(x=>x.type==="income").reduce((a,b)=>a+safeNum(b.amount),0);
+  const expense=tx.filter(x=>x.type==="expense").reduce((a,b)=>a+safeNum(b.amount),0);
+  return `
+  <div class="page-head"><div><h1 class="page-title">التقارير</h1><p class="page-sub">تقارير مبنية فقط على الفترة التي تحددها.</p></div>
+  <div class="actions"><button class="primary" id="printReport">طباعة / PDF</button></div></div>
+  <div class="card panel"><div class="toolbar"><input class="inline-input" type="date" id="reportFrom" value="${f.from}"><input class="inline-input" type="date" id="reportTo" value="${f.to}"><button class="ghost" id="clearReport">كل الفترة</button></div>
+  <div class="stat-strip"><div class="stat"><b>${dev.length}</b><span>أجهزة</span></div><div class="stat"><b>${fmtMoney(income)}</b><span>دخل</span></div><div class="stat"><b>${fmtMoney(expense)}</b><span>مصروف</span></div><div class="stat"><b>${fmtMoney(income-expense)}</b><span>صافي</span></div></div>
+  <div class="grid two-col" style="margin-top:14px">
+    <div class="panel card"><div class="panel-head"><div><h3 class="panel-title">حالات الأجهزة</h3></div></div>${["في الانتظار","قيد الصيانة","جاهز","متأخر","تم التسليم"].map(s=>`<div class="list-row"><div>${s}</div><b>${dev.filter(d=>d.status===s).length}</b></div>`).join("")}</div>
+    <div class="panel card"><div class="panel-head"><div><h3 class="panel-title">طرق الدفع</h3></div></div>${["كاش","فودافون كاش","إنستا باي","تحويل بنكي","تقسيط"].map(m=>`<div class="list-row"><div>${m}</div><b>${fmtMoney(tx.filter(t=>t.method===m).reduce((a,b)=>a+safeNum(b.amount),0))}</b></div>`).join("")}</div>
+  </div></div>`;
+}
+function renderSettings(){
+  const s=state.settings;
+  return `
+  <div class="page-head"><div><h1 class="page-title">الإعدادات</h1><p class="page-sub">إعدادات المنشأة والنسخ الاحتياطي والطباعة والبيانات.</p></div></div>
+  <div class="grid two-col">
+    <div class="card panel">
+      <div class="panel-head"><div><h3 class="panel-title">بيانات المنشأة</h3></div></div>
+      <div class="form-grid">
+        ${field("اسم المنشأة","businessName",s.businessName,"text")}
+        ${field("الهاتف","businessPhone",s.businessPhone,"text")}
+        ${field("واتساب","businessWhatsApp",s.businessWhatsApp,"text")}
+        ${field("العنوان","businessAddress",s.businessAddress,"text","full")}
+        ${field("العملة","currency",s.currency,"text")}
+        <div class="field"><label>عرض الطابعة</label><select id="setting_printerWidth"><option ${s.printerWidth==="58mm"?"selected":""}>58mm</option><option ${s.printerWidth==="80mm"?"selected":""}>80mm</option><option ${s.printerWidth==="A4"?"selected":""}>A4</option></select></div>
+        ${field("أيام الضمان الافتراضية","warrantyDefault",s.warrantyDefault,"number")}
+        ${field("تذييل المستند","invoiceFooter",s.invoiceFooter,"text","full")}
+      </div>
+      <button class="primary" id="saveSettings" style="margin-top:14px">حفظ الإعدادات</button>
+    </div>
+    <div class="card panel">
+      <div class="panel-head"><div><h3 class="panel-title">النسخ والتصدير</h3><div class="panel-sub">بيانات محلية على الجهاز</div></div></div>
+      <div class="list">
+        <div class="list-row"><div><div class="main-t">نسخة احتياطية JSON</div><div class="sub">يحفظ كل البيانات والإعدادات.</div></div><button class="small-btn" data-action="backup">تصدير</button></div>
+        <div class="list-row"><div><div class="main-t">استعادة من JSON</div><div class="sub">استبدال البيانات الحالية بملف سابق.</div></div><button class="small-btn" data-action="restore">استعادة</button></div>
+        <div class="list-row"><div><div class="main-t">بيانات العملاء</div><div class="sub">CSV</div></div><button class="small-btn" data-action="export-customers">تصدير</button></div>
+        <div class="list-row"><div><div class="main-t">بيانات الأجهزة</div><div class="sub">CSV</div></div><button class="small-btn" data-action="export-devices">تصدير</button></div>
+        <div class="list-row"><div><div class="main-t">بيانات المخزون</div><div class="sub">CSV</div></div><button class="small-btn" data-action="export-parts">تصدير</button></div>
+      </div>
+      <input type="file" id="restoreFile" accept=".json,application/json" hidden>
+      <div class="notice" style="margin-top:12px">هذه النسخة لا تحتوي على بيانات جاهزة. النسخة الاحتياطية تُصدّر من المتصفح إلى ملف JSON تختاره أنت.</div>
+    </div>
+  </div>`;
+}
+function field(label,id,value,type="text",full=""){
+  return `<div class="field ${full}"><label>${escapeHtml(label)}</label><input id="setting_${id}" type="${type}" value="${escapeHtml(value??"")}"></div>`;
+}
+
+function openDeviceForm(deviceId=""){
+  const d=deviceId?state.devices.find(x=>x.id===deviceId):null;
+  const cOptions=state.customers.map(c=>`<option value="${c.id}" ${d?.customerId===c.id?"selected":""}>${escapeHtml(c.name)} — ${escapeHtml(c.phone||"")}</option>`).join("");
+  const customerName=d?.customerName||"";
+  openModal(d?"تعديل جهاز":"تسجيل جهاز جديد",`
+    <div class="form-grid">
+      <div class="field full"><label>العميل</label><select id="dev_customer"><option value="">غير مرتبط</option>${cOptions}</select></div>
+      <div class="field"><label>اسم العميل عند الحاجة</label><input id="dev_customerName" value="${escapeHtml(customerName)}" placeholder="يستخدم فقط إذا لم تربطه بعميل"></div>
+      <div class="field"><label>نوع الجهاز</label><select id="dev_type">${["موبايل","لابتوب","تابلت","شاشة","طابعة","أخرى"].map(x=>`<option ${d?.type===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      <div class="field"><label>الماركة</label><input id="dev_brand" value="${escapeHtml(d?.brand||"")}"></div>
+      <div class="field"><label>الموديل</label><input id="dev_model" value="${escapeHtml(d?.model||"")}"></div>
+      <div class="field"><label>السيريال</label><input id="dev_serial" value="${escapeHtml(d?.serial||"")}" required></div>
+      <div class="field"><label>IMEI / Service Tag</label><input id="dev_imei" value="${escapeHtml(d?.imei||"")}"></div>
+      <div class="field"><label>حالة الجهاز عند الاستلام</label><select id="dev_condition">${["سليم","مكسور","به خدوش","أخرى"].map(x=>`<option ${d?.condition===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      <div class="field"><label>الأولوية</label><select id="dev_priority">${["عادي","مستعجل","طارئ"].map(x=>`<option ${d?.priority===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      <div class="field"><label>الحالة</label><select id="dev_status">${["في الانتظار","قيد الصيانة","جاهز","متأخر","تم التسليم"].map(x=>`<option ${d?.status===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      <div class="field"><label>تاريخ الاستلام</label><input id="dev_received" type="date" value="${escapeHtml(d?.receivedDate||today())}"></div>
+      <div class="field"><label>موعد التسليم المتوقع</label><input id="dev_estimated" type="date" value="${escapeHtml(d?.estimatedDate||"")}"></div>
+      <div class="field"><label>أيام الضمان</label><input id="dev_warranty" type="number" min="0" value="${safeNum(d?.warrantyDays)||safeNum(state.settings.warrantyDefault)||30}"></div>
+      <div class="field"><label>التكلفة الإجمالية</label><input id="dev_cost" type="number" min="0" step="0.01" value="${safeNum(d?.cost)}"></div>
+      <div class="field"><label>المدفوع</label><input id="dev_paid" type="number" min="0" step="0.01" value="${safeNum(d?.paid)}"></div>
+      <div class="field"><label>طريقة الدفع</label><select id="dev_method">${["كاش","فودافون كاش","إنستا باي","تحويل بنكي","تقسيط"].map(x=>`<option ${d?.paymentMethod===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      <div class="field full"><label>وصف العطل / المطلوب</label><textarea id="dev_problem" placeholder="اكتب الوصف الحقيقي للجهاز أو العطل">${escapeHtml(d?.problem||"")}</textarea></div>
+      <div class="field full"><label>ملاحظات داخلية</label><textarea id="dev_internal">${escapeHtml(d?.internalNotes||"")}</textarea></div>
+      <div class="field full"><label>ملاحظات للعميل</label><textarea id="dev_customerNotes">${escapeHtml(d?.customerNotes||"")}</textarea></div>
+    </div>
+    <div class="notice" style="margin-top:12px">السيريال يجب أن يكون فريدًا. الدفع الجديد فقط يُضاف كدخل مالي عند حفظ السجل؛ تعديل بيانات الجهاز لا يكرر الدفعات القديمة.</div>
+  `,`<button class="ghost" data-close-modal>إلغاء</button><button class="primary" id="saveDevice">${d?"حفظ التعديل":"حفظ الجهاز"}</button>`);
+  document.getElementById("saveDevice").onclick=()=>{
+    const payload={
+      customerId:val("dev_customer"),
+      customerName:val("dev_customerName").trim(),
+      type:val("dev_type"),brand:val("dev_brand").trim(),model:val("dev_model").trim(),
+      serial:val("dev_serial").trim(),imei:val("dev_imei").trim(),condition:val("dev_condition"),
+      priority:val("dev_priority"),status:val("dev_status"),receivedDate:val("dev_received"),
+      estimatedDate:val("dev_estimated"),warrantyDays:safeNum(val("dev_warranty")),cost:safeNum(val("dev_cost")),
+      paid:safeNum(val("dev_paid")),paymentMethod:val("dev_method"),problem:val("dev_problem"),
+      internalNotes:val("dev_internal"),customerNotes:val("dev_customerNotes")
+    };
+    if(!payload.serial){toast("السيريال مطلوب","err");return;}
+    if(state.devices.some(x=>x.serial&&x.serial.toLowerCase()===payload.serial.toLowerCase()&&x.id!==deviceId)){toast("السيريال مستخدم في جهاز آخر","err");return;}
+    if(payload.customerId){
+      const cc=getCustomer(payload.customerId); if(cc) payload.customerName=cc.name;
+    }
+    if(payload.paid>payload.cost){toast("المدفوع لا يمكن أن يتجاوز التكلفة","err");return;}
+    const old=d?state.devices.find(x=>x.id===deviceId):null;
+    if(d){
+      const delta=safeNum(payload.paid)-safeNum(old?.paid);
+      Object.assign(d,payload, {updatedAt:nowISO(),warrantyExpiry:warrantyExpiry({...d,...payload})});
+      if(delta>0) addFinance("income","دفعة جهاز",delta,payload.paymentMethod,"دفعة إضافية للجهاز "+d.serial);
+      if(delta<0) addFinance("expense","رد مبلغ",-delta,payload.paymentMethod,"استرداد من الجهاز "+d.serial);
+      recordActivity(`تم تعديل الجهاز ${payload.serial}`);
+      toast("تم حفظ تعديل الجهاز");
+    }else{
+      const nd={id:uid("D"),...payload,createdAt:nowISO(),warrantyExpiry:warrantyExpiry(payload)};
+      state.devices.push(nd);
+      if(payload.paid>0) addFinance("income","دفعة جهاز",payload.paid,payload.paymentMethod,"دفعة أولى للجهاز "+payload.serial);
+      recordActivity(`تم تسجيل جهاز ${payload.serial}`);
+      toast("تم تسجيل الجهاز");
+    }
+    saveState();closeModal();render();
+  };
+}
+function val(id){ return document.getElementById(id)?.value??""; }
+
+function openCustomerForm(customerId=""){
+  const c=customerId?state.customers.find(x=>x.id===customerId):null;
+  openModal(c?"تعديل عميل":"عميل جديد",`
+    <div class="form-grid">
+      <div class="field"><label>الاسم</label><input id="cus_name" value="${escapeHtml(c?.name||"")}"></div>
+      <div class="field"><label>رقم الموبايل</label><input id="cus_phone" value="${escapeHtml(c?.phone||"")}" inputmode="numeric"></div>
+      <div class="field"><label>المستوى</label><select id="cus_level">${["عادي","مميز","VIP"].map(x=>`<option ${c?.level===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      <div class="field"><label>النقاط</label><input id="cus_points" type="number" min="0" value="${safeNum(c?.points)}"></div>
+      <div class="field"><label>تاريخ الميلاد</label><input id="cus_birthday" type="date" value="${escapeHtml(c?.birthday||"")}"></div>
+      <div class="field full"><label>ملاحظات</label><textarea id="cus_notes">${escapeHtml(c?.notes||"")}</textarea></div>
+    </div>`,
+    `<button class="ghost" data-close-modal>إلغاء</button><button class="primary" id="saveCustomer">حفظ العميل</button>`);
+  document.getElementById("saveCustomer").onclick=()=>{
+    const name=val("cus_name").trim(), phone=val("cus_phone").replace(/\D/g,"");
+    if(!name){toast("اكتب اسم العميل","err");return;}
+    if(phone && phone.length!==11){toast("رقم الموبايل يجب أن يكون 11 رقمًا","err");return;}
+    if(state.customers.some(x=>x.phone&&x.phone===phone&&x.id!==customerId)){toast("رقم الموبايل مسجل لعميل آخر","err");return;}
+    const p={name,phone,level:val("cus_level"),points:safeNum(val("cus_points")),birthday:val("cus_birthday"),notes:val("cus_notes")};
+    if(c){Object.assign(c,p,{lastVisit:today(),updatedAt:nowISO()});recordActivity(`تم تعديل العميل ${name}`);toast("تم تعديل العميل");}
+    else{state.customers.push({id:uid("C"),...p,lastVisit:today(),createdAt:nowISO()});recordActivity(`تم إضافة العميل ${name}`);toast("تم إضافة العميل");}
+    saveState();closeModal();render();
+  };
+}
+function deleteCustomer(id){
+  const c=getCustomer(id); if(!c) return;
+  if(state.devices.some(d=>d.customerId===id)){toast("لا يمكن حذف العميل لأنه مرتبط بأجهزة","err");return;}
+  if(!confirmAction("حذف العميل؟"))return;
+  state.customers=state.customers.filter(x=>x.id!==id);saveState();recordActivity(`تم حذف العميل ${c.name}`);render();toast("تم حذف العميل");
+}
+function deleteDevice(id){
+  const d=state.devices.find(x=>x.id===id);if(!d)return;
+  if(!confirmAction("حذف سجل الجهاز؟ لا يمكن التراجع عن الحذف."))return;
+  state.devices=state.devices.filter(x=>x.id!==id);saveState();recordActivity(`تم حذف الجهاز ${d.serial||d.id}`);render();toast("تم حذف الجهاز");
+}
+
+function openPartForm(partId=""){
+  const p=partId?state.parts.find(x=>x.id===partId):null;
+  const opts=state.suppliers.map(s=>`<option value="${s.id}" ${p?.supplierId===s.id?"selected":""}>${escapeHtml(s.name)}</option>`).join("");
+  openModal(p?"تعديل قطعة":"قطعة غيار جديدة",`
+    <div class="form-grid">
+      <div class="field full"><label>اسم القطعة</label><input id="part_name" value="${escapeHtml(p?.name||"")}"></div>
+      <div class="field"><label>الباركود</label><input id="part_barcode" value="${escapeHtml(p?.barcode||"")}" inputmode="numeric"></div>
+      <div class="field"><label>المورد</label><select id="part_supplier"><option value="">بدون مورد</option>${opts}</select></div>
+      <div class="field"><label>الموقع</label><input id="part_location" value="${escapeHtml(p?.location||"")}"></div>
+      <div class="field"><label>المخزون</label><input id="part_stock" type="number" min="0" value="${safeNum(p?.stock)}"></div>
+      <div class="field"><label>الحد الأدنى</label><input id="part_min" type="number" min="0" value="${safeNum(p?.minStock)}"></div>
+      <div class="field"><label>سعر الشراء</label><input id="part_buy" type="number" min="0" step="0.01" value="${safeNum(p?.buyPrice)}"></div>
+      <div class="field"><label>سعر البيع</label><input id="part_sell" type="number" min="0" step="0.01" value="${safeNum(p?.sellPrice)}"></div>
+    </div>
+    <div class="notice" style="margin-top:12px">لا يتم توليد باركود عشوائي. أدخل باركود المنتج الفعلي أو اتركه فارغًا إن لم تستخدم باركود.</div>`,
+    `<button class="ghost" data-close-modal>إلغاء</button><button class="primary" id="savePart">حفظ القطعة</button>`);
+  document.getElementById("savePart").onclick=()=>{
+    const pBar=val("part_barcode").trim();
+    if(!val("part_name").trim()){toast("اسم القطعة مطلوب","err");return;}
+    if(pBar && state.parts.some(x=>x.barcode&&x.barcode===pBar&&x.id!==partId)){toast("الباركود مستخدم في قطعة أخرى","err");return;}
+    const payload={name:val("part_name").trim(),barcode:pBar,supplierId:val("part_supplier"),location:val("part_location").trim(),stock:safeNum(val("part_stock")),minStock:safeNum(val("part_min")),buyPrice:safeNum(val("part_buy")),sellPrice:safeNum(val("part_sell"))};
+    if(p){Object.assign(p,payload,{updatedAt:nowISO()});recordActivity(`تم تعديل القطعة ${p.name}`);toast("تم تعديل القطعة");}
+    else{state.parts.push({id:uid("P"),...payload,createdAt:nowISO()});recordActivity(`تم إضافة القطعة ${payload.name}`);toast("تم إضافة القطعة");}
+    saveState();closeModal();render();
+  };
+}
+function deletePart(id){
+  const p=state.parts.find(x=>x.id===id);if(!p)return;
+  if(!confirmAction("حذف قطعة الغيار؟"))return;
+  state.parts=state.parts.filter(x=>x.id!==id);saveState();recordActivity(`تم حذف القطعة ${p.name}`);render();toast("تم حذف القطعة");
+}
+function stockMovement(id,type){
+  const p=state.parts.find(x=>x.id===id);if(!p)return;
+  openModal(type==="in"?"إضافة مخزون":"سحب من المخزون",`
+    <div class="field"><label>الكمية</label><input id="move_qty" type="number" min="1" step="1" value="1"></div>
+    <div class="field" style="margin-top:12px"><label>السبب / البيان</label><input id="move_note" value="${type==="in"?"شراء مخزون":"استخدام/بيع"}"></div>`,
+    `<button class="ghost" data-close-modal>إلغاء</button><button class="primary" id="saveMove">تأكيد</button>`);
+  document.getElementById("saveMove").onclick=()=>{
+    const q=Math.floor(safeNum(val("move_qty")));
+    if(q<1){toast("أدخل كمية صحيحة","err");return;}
+    if(type==="out"&&safeNum(p.stock)<q){toast("الكمية المطلوبة أكبر من المخزون","err");return;}
+    p.stock += type==="in"?q:-q;
+    recordActivity(`${type==="in"?"إضافة":"سحب"} مخزون: ${p.name} × ${q}`);
+    saveState();closeModal();render();toast("تم تحديث المخزون");
+  };
+}
+
+function openSupplierForm(supplierId=""){
+  const s=supplierId?getSupplier(supplierId):null;
+  openModal(s?"تعديل مورد":"مورد جديد",`
+    <div class="form-grid">
+      <div class="field"><label>اسم المورد</label><input id="sup_name" value="${escapeHtml(s?.name||"")}"></div>
+      <div class="field"><label>الموبايل</label><input id="sup_phone" value="${escapeHtml(s?.phone||"")}"></div>
+      <div class="field full"><label>العنوان</label><input id="sup_address" value="${escapeHtml(s?.address||"")}"></div>
+      <div class="field full"><label>ملاحظات</label><textarea id="sup_notes">${escapeHtml(s?.notes||"")}</textarea></div>
+    </div>`,
+    `<button class="ghost" data-close-modal>إلغاء</button><button class="primary" id="saveSupplier">حفظ المورد</button>`);
+  document.getElementById("saveSupplier").onclick=()=>{
+    const name=val("sup_name").trim();if(!name){toast("اسم المورد مطلوب","err");return;}
+    const p={name,phone:val("sup_phone").trim(),address:val("sup_address").trim(),notes:val("sup_notes").trim()};
+    if(s){Object.assign(s,p,{updatedAt:nowISO()});recordActivity(`تم تعديل المورد ${name}`);toast("تم تعديل المورد");}
+    else{state.suppliers.push({id:uid("S"),...p,createdAt:nowISO()});recordActivity(`تم إضافة المورد ${name}`);toast("تم إضافة المورد");}
+    saveState();closeModal();render();
+  };
+}
+function deleteSupplier(id){
+  const s=getSupplier(id);if(!s)return;
+  if(state.parts.some(p=>p.supplierId===id)){toast("لا يمكن حذف المورد لأنه مرتبط بقطع غيار","err");return;}
+  if(!confirmAction("حذف المورد؟"))return;
+  state.suppliers=state.suppliers.filter(x=>x.id!==id);saveState();recordActivity(`تم حذف المورد ${s.name}`);render();toast("تم حذف المورد");
+}
+
+function openTransactionForm(){
+  openModal("عملية مالية جديدة",`
+  <div class="form-grid">
+    <div class="field"><label>النوع</label><select id="tx_type"><option value="income">دخل</option><option value="expense">مصروف</option></select></div>
+    <div class="field"><label>التاريخ</label><input id="tx_date" type="date" value="${today()}"></div>
+    <div class="field"><label>التصنيف</label><input id="tx_category" placeholder="اكتب التصنيف"></div>
+    <div class="field"><label>المبلغ</label><input id="tx_amount" type="number" min="0" step="0.01"></div>
+    <div class="field"><label>طريقة الدفع</label><select id="tx_method">${["كاش","فودافون كاش","إنستا باي","تحويل بنكي","تقسيط"].map(x=>`<option>${x}</option>`).join("")}</select></div>
+    <div class="field"><label>البيان</label><input id="tx_note"></div>
+  </div>`,
+  `<button class="ghost" data-close-modal>إلغاء</button><button class="primary" id="saveTx">حفظ العملية</button>`);
+  document.getElementById("saveTx").onclick=()=>{
+    const amount=safeNum(val("tx_amount"));
+    if(amount<=0){toast("أدخل مبلغًا صحيحًا","err");return;}
+    addFinance(val("tx_type"),val("tx_category").trim()||"عام",amount,val("tx_method"),val("tx_note").trim(),val("tx_date"));
+    closeModal();render();toast("تم تسجيل العملية");
+  };
+}
+function addFinance(type,category,amount,method,note,date=today()){
+  state.transactions.push({id:uid("T"),date,type,category,amount:safeNum(amount),method,note,createdAt:nowISO()});
+  recordActivity(`${type==="income"?"دخل":"مصروف"} ${fmtMoney(amount)} • ${category}`);
+  saveState();
+}
+function deleteTransaction(id){
+  const t=state.transactions.find(x=>x.id===id);if(!t)return;
+  if(!confirmAction("حذف العملية المالية؟"))return;
+  state.transactions=state.transactions.filter(x=>x.id!==id);saveState();recordActivity(`تم حذف عملية مالية ${fmtMoney(t.amount)}`);render();toast("تم حذف العملية");
+}
+function dailyClose(){
+  const d=today(), rows=state.transactions.filter(x=>x.date===d);
+  const income=rows.filter(x=>x.type==="income").reduce((a,b)=>a+safeNum(b.amount),0);
+  const expense=rows.filter(x=>x.type==="expense").reduce((a,b)=>a+safeNum(b.amount),0);
+  openModal("إغلاق اليوم",`<div class="stat-strip"><div class="stat"><b>${fmtMoney(income)}</b><span>دخل اليوم</span></div><div class="stat"><b>${fmtMoney(expense)}</b><span>مصروف اليوم</span></div><div class="stat"><b>${fmtMoney(income-expense)}</b><span>صافي اليوم</span></div><div class="stat"><b>${rows.length}</b><span>عدد العمليات</span></div></div><div class="notice" style="margin-top:12px">يمكنك طباعة تقرير الإغلاق من نافذة الطباعة في التقارير.</div>`,
+    `<button class="ghost" data-close-modal>إغلاق</button><button class="primary" id="printClose">طباعة</button>`);
+  document.getElementById("printClose").onclick=()=>{closeModal();printDailyClose(d,income,expense,rows.length)};
+}
+
+function printDocument(id){
+  const d=state.documents.find(x=>x.id===id);if(!d)return;
+  printHtml(d.html);
+}
+function createDeviceDocument(id){
+  const d=state.devices.find(x=>x.id===id);if(!d)return;
+  const c=getCustomer(d.customerId);
+  const num="DOC-"+Date.now().toString(36).toUpperCase();
+  const html=devicePrintableHtml(d,c,num);
+  state.documents.push({id:uid("DOC"),title:"مستند جهاز • "+(d.serial||d.id),number:num,createdAt:nowISO(),deviceId:id,html});
+  saveState();recordActivity(`تم إنشاء مستند ${num}`);render();printHtml(html);
+}
+function printDevice(id){
+  const d=state.devices.find(x=>x.id===id);if(!d)return;
+  const c=getCustomer(d.customerId);
+  printHtml(devicePrintableHtml(d,c,""));
+}
+function printDailyClose(date,income,expense,count){
+  const html=`
+  <html dir="rtl"><head><meta charset="utf-8"><style>${printCss()}</style></head><body>
+  <div class="sheet"><h1>${escapeHtml(state.settings.businessName||"تقرير إغلاق اليوم")}</h1><div>${date}</div>
+  <hr><table><tr><th>البيان</th><th>القيمة</th></tr><tr><td>إجمالي الدخل</td><td>${fmtMoney(income)}</td></tr><tr><td>إجمالي المصروف</td><td>${fmtMoney(expense)}</td></tr><tr><td>الصافي</td><td>${fmtMoney(income-expense)}</td></tr><tr><td>عدد العمليات</td><td>${count}</td></tr></table>
+  <div class="footerline">${escapeHtml(state.settings.invoiceFooter||DEV.label)}</div></div></body></html>`;
+  printHtml(html);
+}
+function printHtml(inner){
+  const w=window.open("","_blank","width=900,height=760");
+  if(!w){toast("المتصفح منع نافذة الطباعة. اسمح بالنوافذ المنبثقة.","err");return;}
+  w.document.write(inner);w.document.close();setTimeout(()=>{w.focus();w.print();},350);
+}
+function printCss(){
+  const width=state.settings.printerWidth||"80mm";
+  const sheetWidth=width==="A4"?"210mm":width;
+  return `@page{size:${sheetWidth} auto;margin:6mm}body{font-family:Arial,Tahoma,sans-serif;color:#111;margin:0}.sheet{width:${width==="A4"?"190mm":width};max-width:100%;margin:auto}h1{font-size:20px;margin:0 0 8px}.center{text-align:center}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #ddd;padding:7px;text-align:right;font-size:12px}.footerline{margin-top:18px;padding-top:8px;border-top:1px solid #ddd;font-size:10px;color:#555}`;
+}
+function devicePrintableHtml(d,c,num){
+  const s=state.settings;
+  return `<html dir="rtl"><head><meta charset="utf-8"><style>${printCss()}</style></head><body>
+  <div class="sheet">
+    <div class="center"><h1>${escapeHtml(s.businessName||"نظام إدارة الصيانة")}</h1><div>${escapeHtml(s.businessAddress||"")}</div><div>${escapeHtml(s.businessPhone||"")}</div></div>
+    <hr>
+    ${num?`<div><b>رقم المستند:</b> ${escapeHtml(num)}</div>`:""}
+    <div><b>التاريخ:</b> ${today()}</div>
+    <table>
+      <tr><th>العميل</th><td>${escapeHtml(c?.name||d.customerName||"—")}</td></tr>
+      <tr><th>الموبايل</th><td>${escapeHtml(c?.phone||"—")}</td></tr>
+      <tr><th>الجهاز</th><td>${escapeHtml([d.brand,d.model].filter(Boolean).join(" ")||d.type)}</td></tr>
+      <tr><th>السيريال</th><td>${escapeHtml(d.serial||"—")}</td></tr>
+      <tr><th>الحالة</th><td>${escapeHtml(d.status||"—")}</td></tr>
+      <tr><th>العطل</th><td>${escapeHtml(d.problem||"—")}</td></tr>
+      <tr><th>التكلفة</th><td>${fmtMoney(d.cost)}</td></tr>
+      <tr><th>المدفوع</th><td>${fmtMoney(d.paid)}</td></tr>
+      <tr><th>المتبقي</th><td>${fmtMoney(deviceBalance(d))}</td></tr>
+      <tr><th>الضمان حتى</th><td>${escapeHtml(d.warrantyExpiry||"—")}</td></tr>
+    </table>
+    <div class="footerline">${escapeHtml(s.invoiceFooter||"")}</div>
+  </div></body></html>`;
+}
+function whatsappDevice(id){
+  const d=state.devices.find(x=>x.id===id);if(!d)return;
+  const c=getCustomer(d.customerId);
+  const phone=(c?.phone||"").replace(/\D/g,"");
+  if(!phone){toast("لا يوجد رقم واتساب صالح للعميل","err");return;}
+  const msg=`مرحبًا ${c?.name||d.customerName||""}
+حالة الجهاز: ${d.status}
+الجهاز: ${[d.brand,d.model].filter(Boolean).join(" ")||d.type}
+السيريال: ${d.serial||""}
+المتبقي: ${fmtMoney(deviceBalance(d))}
+`;
+  window.open("https://wa.me/2"+phone+"?text="+encodeURIComponent(msg),"_blank","noopener");
+}
+
+function showShortcuts(){
+  const items=[
+    ["لوحة التحكم","Ctrl+1"],["الأجهزة","Ctrl+2"],["العملاء","Ctrl+3"],["قطع الغيار","Ctrl+4"],["الموردون","Ctrl+5"],["المالية","Ctrl+6"],["المستندات","Ctrl+7"],["التقارير","Ctrl+8"],
+    ["إضافة جهاز","Ctrl+N"],["إضافة عميل","Ctrl+Shift+C"],["إضافة قطعة","Ctrl+Shift+P"],["إضافة مورد","Ctrl+Shift+S"],["بحث شامل","Ctrl+F"],["الأوامر السريعة","Ctrl+K"],["طباعة","Ctrl+P"],["إغلاق نافذة","Esc"],["السجل السابق","↑"],["السجل التالي","↓"],["تعديل السجل المحدد","Enter"],["حذف السجل المحدد","Delete"]
+  ];
+  openModal("اختصارات النظام",`<div class="shortcuts">${items.map(([a,k])=>`<div class="shortcut"><span>${a}</span><kbd>${k}</kbd></div>`).join("")}</div><div class="notice" style="margin-top:12px">أسهم ↑ ↓ تعمل داخل القوائم عندما لا يكون المؤشر داخل خانة كتابة. قارئ الباركود يمكنه الكتابة في خانة ماسح الباركود ثم إرسال Enter.</div>`);
+}
+
+function commands(){
+  return [
+    ["اذهب للوحة التحكم","Ctrl+1",()=>navigate("dashboard")],
+    ["افتح الأجهزة","Ctrl+2",()=>navigate("devices")],
+    ["افتح العملاء","Ctrl+3",()=>navigate("customers")],
+    ["افتح قطع الغيار","Ctrl+4",()=>navigate("parts")],
+    ["افتح الموردين","Ctrl+5",()=>navigate("suppliers")],
+    ["افتح المالية","Ctrl+6",()=>navigate("finance")],
+    ["افتح المستندات","Ctrl+7",()=>navigate("documents")],
+    ["افتح التقارير","Ctrl+8",()=>navigate("reports")],
+    ["افتح الإعدادات","",()=>navigate("settings")],
+    ["جهاز جديد","Ctrl+N",()=>openDeviceForm()],
+    ["عميل جديد","Ctrl+Shift+C",()=>openCustomerForm()],
+    ["قطعة جديدة","Ctrl+Shift+P",()=>openPartForm()],
+    ["مورد جديد","Ctrl+Shift+S",()=>openSupplierForm()],
+    ["اختصارات الكيبورد","",()=>showShortcuts()],
+    ["تصدير نسخة JSON","",()=>backupJson()]
+  ];
+}
+function openCommandPalette(){
+  commandItems=commands();
+  commandIndex=0;
+  openModal("الأوامر السريعة",`
+    <div class="field"><input id="commandSearch" placeholder="اكتب اسم الأمر..." autofocus></div>
+    <div class="command-list" id="commandList" style="margin-top:10px"></div>`);
+  const input=document.getElementById("commandSearch");
+  input.addEventListener("input",renderCommands);
+  input.addEventListener("keydown",e=>{
+    if(e.key==="ArrowDown"){e.preventDefault();commandIndex=Math.min(commandIndex+1,filteredCommands().length-1);renderCommands();}
+    else if(e.key==="ArrowUp"){e.preventDefault();commandIndex=Math.max(commandIndex-1,0);renderCommands();}
+    else if(e.key==="Enter"){e.preventDefault();const x=filteredCommands()[commandIndex];if(x){closeModal();x[2]();}}
+  });
+  renderCommands();setTimeout(()=>input.focus(),30);
+}
+function filteredCommands(){
+  const q=(document.getElementById("commandSearch")?.value||"").toLowerCase();
+  return commandItems.filter(x=>x[0].toLowerCase().includes(q));
+}
+function renderCommands(){
+  const list=document.getElementById("commandList"); if(!list)return;
+  const arr=filteredCommands();
+  if(commandIndex>=arr.length) commandIndex=Math.max(0,arr.length-1);
+  list.innerHTML=arr.map((x,i)=>`<button class="command ${i===commandIndex?"focused":""}" data-cmd="${i}"><span>${escapeHtml(x[0])}</span><span class="kbd">${escapeHtml(x[1])}</span></button>`).join("");
+  list.querySelectorAll("[data-cmd]").forEach((b,i)=>b.onclick=()=>{const x=arr[i];closeModal();x[2]();});
+}
+
+function backupJson(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json;charset=utf-8"});
+  downloadBlob(blob,`maintenance-backup-${today()}.json`);
+  toast("تم إنشاء النسخة الاحتياطية");
+}
+function downloadBlob(blob,name){
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),800);
+}
+function exportCSV(rows,name,keys){
+  const lines=[keys.join(",")].concat(rows.map(r=>keys.map(k=>csvCell(r?.[k])).join(",")));
+  downloadBlob(new Blob(["\uFEFF"+lines.join("\n")],{type:"text/csv;charset=utf-8"}),name);
+  toast("تم التصدير");
+}
+function csvCell(v){return `"${String(v??"").replace(/"/g,'""')}"`;}
+
+document.addEventListener("change",e=>{
+  if(e.target.id==="deviceSearch"){filters.devices.search=e.target.value;render();}
+  if(e.target.id==="deviceStatus"){filters.devices.status=e.target.value;render();}
+  if(e.target.id==="deviceType"){filters.devices.type=e.target.value;render();}
+  if(e.target.id==="deviceFrom"){filters.devices.from=e.target.value;render();}
+  if(e.target.id==="deviceTo"){filters.devices.to=e.target.value;render();}
+  if(e.target.id==="customerSearch"){filters.customers.search=e.target.value;render();}
+  if(e.target.id==="customerLevel"){filters.customers.level=e.target.value;render();}
+  if(e.target.id==="partSearch"){filters.parts.search=e.target.value;render();}
+  if(e.target.id==="partStock"){filters.parts.stock=e.target.value;render();}
+  if(e.target.id==="supplierSearch"){filters.suppliers.search=e.target.value;render();}
+  if(e.target.id==="financeFrom"){filters.finance.from=e.target.value;render();}
+  if(e.target.id==="financeTo"){filters.finance.to=e.target.value;render();}
+  if(e.target.id==="financeType"){filters.finance.type=e.target.value;render();}
+  if(e.target.id==="reportFrom"){filters.reports.from=e.target.value;render();}
+  if(e.target.id==="reportTo"){filters.reports.to=e.target.value;render();}
+  if(e.target.id==="setting_printerWidth"){state.settings.printerWidth=e.target.value;saveState();}
+});
+document.addEventListener("keyup",e=>{
+  const tag=(document.activeElement?.tagName||"").toLowerCase();
+  const typing=["input","textarea","select"].includes(tag);
+  if(e.key==="Escape"){closeModal();return;}
+  if(e.ctrlKey && e.key.toLowerCase()==="f"){e.preventDefault();document.getElementById("globalSearch")?.focus();return;}
+  if(e.ctrlKey && e.key.toLowerCase()==="k"){e.preventDefault();openCommandPalette();return;}
+  if(e.ctrlKey && e.key.toLowerCase()==="n" && !typing){e.preventDefault();openDeviceForm();return;}
+  if(e.ctrlKey && e.shiftKey && e.key.toLowerCase()==="c" && !typing){e.preventDefault();openCustomerForm();return;}
+  if(e.ctrlKey && e.shiftKey && e.key.toLowerCase()==="p" && !typing){e.preventDefault();openPartForm();return;}
+  if(e.ctrlKey && e.shiftKey && e.key.toLowerCase()==="s" && !typing){e.preventDefault();openSupplierForm();return;}
+  if(e.ctrlKey && e.key.toLowerCase()==="p"){e.preventDefault();window.print();return;}
+  if(e.ctrlKey && !e.shiftKey && /^[1-8]$/.test(e.key) && !typing){e.preventDefault();navigate(navItems()[Number(e.key)-1][0]);return;}
+  if(!typing && currentPage==="devices"){
+    if(e.key==="ArrowDown"||e.key==="ArrowUp"||e.key==="Enter"||e.key==="Delete"){
+      handleTableKey("devices",state.devices.filter(d=>{
+        const f=filters.devices,q=f.search;
+        return textSearch(d,q)&&(f.status==="all"||d.status===f.status)&&(f.type==="all"||d.type===f.type)&&(!f.from||(d.receivedDate||"")>=f.from)&&(!f.to||(d.receivedDate||"")<=f.to);
+      }),e);return;
+    }
+  }
+  if(!typing && currentPage==="customers" && ["ArrowDown","ArrowUp","Enter","Delete"].includes(e.key)){
+    handleTableKey("customers",state.customers.filter(c=>textSearch(c,filters.customers.search)&&(filters.customers.level==="all"||c.level===filters.customers.level)),e);return;
+  }
+  if(!typing && currentPage==="parts" && ["ArrowDown","ArrowUp","Enter","Delete"].includes(e.key)){
+    handleTableKey("parts",state.parts.filter(p=>textSearch(p,filters.parts.search)),e);return;
+  }
+  if(!typing && currentPage==="suppliers" && ["ArrowDown","ArrowUp","Enter","Delete"].includes(e.key)){
+    handleTableKey("suppliers",state.suppliers.filter(s=>textSearch(s,filters.suppliers.search)),e);return;
+  }
+  if(!typing && currentPage==="finance" && ["ArrowDown","ArrowUp","Delete"].includes(e.key)){
+    const f=filters.finance; const rows=state.transactions.filter(t=>(!f.from||t.date>=f.from)&&(!f.to||t.date<=f.to)&&(f.type==="all"||t.type===f.type)).sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+    handleTableKey("transactions",rows,e);
+  }
+});
+function handleTableKey(key,rows,e){
+  if(e.key==="ArrowDown"){e.preventDefault();selected[key]=Math.min((selected[key]??-1)+1,rows.length-1);render();scrollSelected();}
+  if(e.key==="ArrowUp"){e.preventDefault();selected[key]=Math.max((selected[key]??0)-1,0);render();scrollSelected();}
+  if(e.key==="Enter"){e.preventDefault();const row=rows[selected[key]];if(!row)return; if(key==="devices")openDeviceForm(row.id); if(key==="customers")openCustomerForm(row.id); if(key==="parts")openPartForm(row.id); if(key==="suppliers")openSupplierForm(row.id);}
+  if(e.key==="Delete"){e.preventDefault();const row=rows[selected[key]];if(!row)return; if(key==="devices")deleteDevice(row.id); if(key==="customers")deleteCustomer(row.id); if(key==="parts")deletePart(row.id); if(key==="suppliers")deleteSupplier(row.id); if(key==="transactions")deleteTransaction(row.id);}
+}
+function scrollSelected(){
+  const row=document.querySelector("tbody tr.selected");row?.scrollIntoView({block:"nearest"});
+}
+
+document.addEventListener("input",e=>{
+  if(e.target.id==="barcodeQuick"){
+    const code=e.target.value.trim();
+    if(e.inputType==="insertText" && code.length>8) filters.parts.search=code;
+  }
+});
+document.addEventListener("keydown",e=>{
+  if(e.target?.id==="barcodeQuick"&&e.key==="Enter"){
+    e.preventDefault();
+    const code=e.target.value.trim(); if(!code)return;
+    const p=state.parts.find(x=>x.barcode===code);
+    if(p){filters.parts.search=code;toast(`تم العثور على القطعة: ${p.name}`);render();}
+    else toast("الباركود غير موجود في المخزون","err");
+  }
+});
+
+document.addEventListener("click",e=>{
+  if(e.target.id==="saveSettings"){
+    const ids=["businessName","businessPhone","businessWhatsApp","businessAddress","currency","warrantyDefault","invoiceFooter"];
+    ids.forEach(id=>{
+      const el=document.getElementById("setting_"+id);
+      if(el) state.settings[id]=id==="warrantyDefault"?safeNum(el.value):el.value.trim();
+    });
+    saveState();render();toast("تم حفظ الإعدادات");
+  }
+  if(e.target.id==="printReport"){window.print();}
+  if(e.target.id==="clearReport"){filters.reports={from:"",to:""};render();}
+  if(e.target.id==="restoreFile"){ /* input is clicked through label/action */ }
+});
+document.addEventListener("change",e=>{
+  if(e.target.id==="restoreFile"){
+    const f=e.target.files?.[0]; if(!f)return;
+    const r=new FileReader();
+    r.onload=()=>{
+      try{
+        const parsed=JSON.parse(r.result);
+        if(!parsed||typeof parsed!=="object"||!Array.isArray(parsed.devices)||!Array.isArray(parsed.customers)) throw new Error("invalid");
+        if(!confirmAction("استعادة النسخة الاحتياطية ستستبدل البيانات الحالية. متابعة؟"))return;
+        state={...structuredClone(defaultState),...parsed,settings:{...defaultState.settings,...(parsed.settings||{})}};
+        saveState();render();toast("تمت استعادة النسخة الاحتياطية");
+      }catch(err){toast("ملف النسخة الاحتياطية غير صالح","err");}
+    };
+    r.readAsText(f);
+  }
+});
+
+window.printDocument=printDocument;
+
+render();
+})();
+</script>
+</body>
+</html>
