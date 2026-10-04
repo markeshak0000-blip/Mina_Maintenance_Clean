@@ -1,0 +1,63 @@
+{
+  "name": "mina-maintenance",
+  "version": "7.0.0",
+  "description": "Mina Maintenance - Windows desktop maintenance management system",
+  "main": "main.js",
+  "author": {
+    "name": "ENG. Mark Eshak | Infinity MEN2"
+  },
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis portable",
+    "dist:installer": "electron-builder --win nsis",
+    "dist:portable": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "44.5.1",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.infinitymen2.minamaintenance",
+    "productName": "Mina Maintenance",
+    "artifactName": "Mina-Maintenance-${version}-${arch}.${ext}",
+    "asar": true,
+    "compression": "maximum",
+    "files": [
+      "app/**/*",
+      "main.js",
+      "preload.js",
+      "package.json",
+      "build/icon.*",
+      "build/Mina-Maintenance.ico"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "icon": "build/Mina-Maintenance.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "publisherName": "Infinity MEN2"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Mina Maintenance",
+      "uninstallDisplayName": "Mina Maintenance",
+      "deleteAppDataOnUninstall": false
+    }
+  }
+}

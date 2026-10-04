@@ -1,0 +1,21 @@
+Mina Maintenance 7.0.0 — Windows Packaging
+
+Application ID: com.infinitymen2.minamaintenance
+Product name: Mina Maintenance
+Architecture: Windows x64
+Packaging: Electron + electron-builder
+Electron: 44.5.1
+Electron Builder: 26.15.3
+
+Primary icon:
+build\Mina-Maintenance.ico
+
+Windows build command:
+npm install
+npm run dist
+
+Outputs:
+dist\Mina-Maintenance-7.0.0-x64.exe
+
+The NSIS installer creates a desktop shortcut and a Start Menu shortcut.
+The Portable target does not require installation.
